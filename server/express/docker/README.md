@@ -1,0 +1,1 @@
+This docker folder for development or running server & databases only 

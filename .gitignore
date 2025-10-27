@@ -1,0 +1,14 @@
+# Node.js dependencies
+node_modules/
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment files
+
+# Build output
+dist/
+build/

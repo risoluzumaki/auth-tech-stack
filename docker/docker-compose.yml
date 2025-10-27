@@ -1,0 +1,12 @@
+services:
+  db:
+    image: postgres:latest
+    container_name: my_postgres
+    environment:
+      POSTGRES_USER: pgdb
+      POSTGRES_PASSWORD: pgdb
+      POSTGRES_DB: pgdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./migration/:/docker-entrypoint-initdb.d/

@@ -1,0 +1,22 @@
+services:
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: pgdb
+      POSTGRES_PASSWORD: pgdb
+      POSTGRES_DB: pgdb
+    ports:
+      - "5432:5432"
+  app:
+    build:
+      context: ..
+      dockerfile: ./docker/Dockerfile
+    environment:
+      DATABASE_URL: postgresql://pgdb:pgdb@db:5432/pgdb
+      JWT_SECRET: supersecret
+      JWT_REFRESH: superrefresh
+      PORTAPP: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
