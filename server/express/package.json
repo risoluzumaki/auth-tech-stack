@@ -8,6 +8,8 @@
     "start": "node dist/server.js",
     "prisma:init": "npx prisma init",
     "prisma:pull": "npx prisma db pull",
+    "prisma:seeddev" : "ts-node src/config/seed.ts",
+    "prisma:seed" : "node dist/config/seed.js",
     "prisma:generate" : "npx prisma generate"
   },
   "dependencies": {

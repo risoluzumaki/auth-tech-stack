@@ -23,7 +23,7 @@ export class AuthService {
     
     const user = await this.userRepository.findByEmail(email);
     if(!user){
-      throw new Error("User not found");
+      throw new ApiError(404, "User not found");
     }
 
     const isPasswordValid = await BcryptUtil.compare(password, user.password);

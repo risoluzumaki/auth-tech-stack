@@ -1,4 +1,8 @@
+#  =============== 
+#  Build Stage
+# ===============
 FROM node:22 AS builder
+
 WORKDIR /app
 
 COPY package*.json ./
@@ -9,23 +13,26 @@ COPY . .
 
 RUN npm run build
 
+# =============== 
+#  RUn Stage
+# ===============
 FROM node:22-alpine
-
 
 WORKDIR /app
 
-COPY package*.json ./
-COPY prisma ./
-COPY .env ./
+# ========== ENV From ARGS 
+ARG DATABASE_URL
+ENV DATABASE_URL=$DATABASE_URL
+# =========
 
-# Copy built TypeScript files
+COPY package*.json ./
+
+COPY prisma ./
+
 COPY --from=builder /app/dist ./dist
 
 RUN npm install --production
-RUN npm run prisma:generate
 
-# Expose port if needed
 EXPOSE 3000
 
-# Run the application
 CMD ["npm", "start"]

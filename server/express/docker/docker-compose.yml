@@ -7,15 +7,27 @@ services:
       POSTGRES_DB: pgdb
     ports:
       - "5432:5432"
+    volumes:
+      - ./migration/01_users.sql:/docker-entrypoint-initdb.d/01_users.sql
+
   app:
     build:
       context: ..
       dockerfile: ./docker/Dockerfile
+      args:
+        DATABASE_URL: ${DATABASE_URL}
     environment:
-      DATABASE_URL: postgresql://pgdb:pgdb@db:5432/pgdb
-      JWT_SECRET: supersecret
-      JWT_REFRESH: superrefresh
+      DATABASE_URL: ${DATABASE_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_REFRESH: ${JWT_REFRESH}
       PORTAPP: 3000
+    command: >
+      sh -c "
+      npm run prisma:pull &&
+      npm run prisma:generate &&
+      npm run prisma:seed &&
+      npm start
+      "
     ports:
       - "3000:3000"
     depends_on:
