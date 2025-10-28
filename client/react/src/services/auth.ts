@@ -1,31 +1,34 @@
 import api from "./api";
 
-export interface LoginPayload {
+type LoginPayload = {
   email: string;
   password: string;
 }
 
-export interface LoginResponse {
-  token: string;
-  user: {
-    id: number;
-    name: string;
-    email: string;
-  };
-}
-
-export const loginUser = async (payload: LoginPayload ) => {
-  const response = await api.post("/login", payload)
-  return response;  
-}
-
 type RegisterPayload = {
+  username: string,
   name: string,
   email: string,
   password: string
 }
 
+export const loginUser = async (payload: LoginPayload ) => {
+  try {
+    const response = await api.post("/auth/login", payload)
+    console.log(response)
+    return response.data;
+  } catch (error: any) {
+    const meesageError = error.response?.data?.message || error.message || "Something went wrong";
+    throw new Error(meesageError)
+  }
+}
+
 export const registerUser =  async (payload : RegisterPayload ) => {
-  const response = await api.post("/register", payload )
-  return response
+  try {
+    const response = await api.post("/auth/register", payload )
+    console.log(response)
+    return response.data
+  } catch (error) {
+    throw error
+  }
 }
