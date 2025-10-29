@@ -1,0 +1,11 @@
+services:
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: pgdb
+      POSTGRES_PASSWORD: pgdb
+      POSTGRES_DB: pgdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db/01_users.sql:/docker-entrypoint-initdb.d/01_users.sql
