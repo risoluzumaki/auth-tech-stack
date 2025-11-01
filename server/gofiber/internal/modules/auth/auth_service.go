@@ -5,9 +5,14 @@ import (
 	u "gofiber/pkg/utils"
 )
 
+type LoginResult struct {
+	AccessToken  string
+	RefreshToken string
+}
+
 type AuthServiceInterface interface {
 	RegisterUser(username string, name string, email string, password string) error
-	LoginUser(email string) (*ur.User, error)
+	LoginUser(email string, password string) (*LoginResult, error)
 }
 
 type AuthService struct {
@@ -45,7 +50,7 @@ func (s *AuthService) RegisterUser(
 	return nil
 }
 
-func (s *AuthService) LoginUser(email string, password string) (*ur.User, error) {
+func (s *AuthService) LoginUser(email string, password string) (*LoginResult, error) {
 	user, err := s.userRepository.FindByEmail(email)
 	if err != nil {
 		return nil, u.NewAppError(404, "User not found")
@@ -54,6 +59,21 @@ func (s *AuthService) LoginUser(email string, password string) (*ur.User, error)
 	if err != nil || !passwordCompare {
 		return nil, u.NewAppError(401, "Invalid credentials")
 	}
-
-	return user, nil
+	accessToken, err := u.GenerateToken(int(user.ID), user.Email)
+	if err != nil {
+		return nil, u.NewAppError(500, "Failed to generate token")
+	}
+	refreshToken, err := u.GenerateRefreshToken(int(user.ID), user.Email)
+	if err != nil {
+		return nil, u.NewAppError(500, "Failed to generate refresh token")
+	}
+	err = s.userRepository.UpdateToken(user.ID, refreshToken)
+	if err != nil {
+		return nil, u.NewAppError(500, "Failed to update token")
+	}
+	result := &LoginResult{
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+	}
+	return result, nil
 }

@@ -1,7 +1,8 @@
 package auth
 
 import (
-	up "gofiber/internal/modules/user"
+	up "gofiber/internal/modules/user" // User Package (up)
+	"gofiber/pkg/logger"
 	u "gofiber/pkg/utils"
 
 	"github.com/gofiber/fiber/v2"
@@ -43,17 +44,20 @@ func (h *AuthHandler) RegisterUser(ctx *fiber.Ctx) error {
 }
 
 func (h *AuthHandler) LoginUser(ctx *fiber.Ctx) error {
+	logger.Log.Debug("LoginUser")
 	var userDto up.LoginUserDto
 	if err := ctx.BodyParser(&userDto); err != nil {
 		return u.NewAppError(400, "Invalid request body")
 	}
-
-	_, err := h.authService.LoginUser(userDto.Email, userDto.Password)
+	result, err := h.authService.LoginUser(userDto.Email, userDto.Password)
 	if err != nil {
 		return err
 	}
 
-	return ctx.Status(200).JSON(fiber.Map{
-		"message": "Login Success",
-	})
+	response := &up.LoginResponseDto{
+		AccessToken:  result.AccessToken,
+		RefreshToken: result.RefreshToken,
+	}
+
+	return ctx.Status(200).JSON(response)
 }

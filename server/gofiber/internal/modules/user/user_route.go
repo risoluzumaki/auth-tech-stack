@@ -1,7 +1,12 @@
 package user
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"gofiber/internal/middleware"
 
-func AuthRoute(r *fiber.Route) {
+	"github.com/gofiber/fiber/v2"
+)
 
+func UserRoute(r fiber.Router, h *UserHandler) {
+
+	r.Get("/profile", middleware.Auth, h.ProfileUser)
 }

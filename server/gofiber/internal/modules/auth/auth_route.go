@@ -1,6 +1,8 @@
 package auth
 
 import (
+	// "gofiber/internal/middleware"
+
 	"github.com/gofiber/fiber/v2"
 )
 

@@ -10,7 +10,8 @@ import (
 type UserRepositoryInterface interface {
 	Create(username string, name string, email string, password string) error
 	FindByEmail(email string) (*User, error)
-	FindByID(id int) (*User, error)
+	FindByID(id uint) (*User, error)
+	UpdateToken(id uint, token string) error
 }
 
 type UserRepository struct {
@@ -55,8 +56,13 @@ func (r *UserRepository) FindByEmail(email string) (*User, error) {
 	return &user, nil
 }
 
-func (r *UserRepository) FindByID(id int) (*User, error) {
+func (r *UserRepository) FindByID(id uint) (*User, error) {
 	var user User
 	err := r.db.Where("id = ?", id).First(&user).Error
 	return &user, err
+}
+
+func (r *UserRepository) UpdateToken(id uint, token string) error {
+	err := r.db.Model(&User{}).Where("id = ?", id).Update("token", token).Error
+	return err
 }

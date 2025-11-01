@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"gofiber/internal/modules/auth"
 	"gofiber/internal/modules/user"
-	config "gofiber/pkg/database"
+	database "gofiber/pkg/database"
+	log "gofiber/pkg/logger"
 	"gofiber/pkg/utils"
 	"os"
 
@@ -17,9 +18,11 @@ import (
 )
 
 func Bootstrapp() {
+	log.Init()
 	godotenv.Load()
-	config.ConnectDatabase()
-	db := config.DB
+	database.ConnectDatabase()
+	database.SeedData()
+	db := database.DB
 
 	app := fiber.New(fiber.Config{
 		ErrorHandler: func(c *fiber.Ctx, err error) error {
@@ -64,16 +67,24 @@ func Bootstrapp() {
 	authService := auth.NewAuthService(userRepository)
 	authHandler := auth.NewAuthHandler(authService)
 
+	//  USER MODULE
+	userService := user.NewUserService(userRepository)
+	userHandler := user.NewUserHandler(userService)
+
 	// RPOUTING GROUPING
 	api := app.Group("/api/v1")
 	authRoute := api.Group("/auth")
+	userRoute := api.Group("/user")
+
 	auth.AuthRoute(authRoute, authHandler)
+	user.UserRoute(userRoute, userHandler)
 
 	fmt.Println("Launch")
 
 	port := os.Getenv("PORT_APP")
 	if port == "" {
-		port = ":8080"
+		port = "8080"
 	}
-	app.Listen(port)
+	fmt.Println(port)
+	app.Listen(":" + port)
 }
